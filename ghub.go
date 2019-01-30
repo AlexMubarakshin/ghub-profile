@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
+
+	"./utils"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -19,11 +22,16 @@ type GitHubProfile struct {
 	Login string
 }
 
-const repoSrc = "https://github.com/AlexMubarakshin?tab=repositories"
-
 func main() {
+	var reposUrl string
 
-	profile, err := parseGithubProfile(repoSrc)
+	if len(os.Args) > 1 {
+		reposUrl = utils.BuildGithubUrlByUsername(os.Args[1])
+	} else {
+		reposUrl = utils.BuildGithubUrlByUsername("AlexMubarakshin")
+	}
+
+	profile, err := parseGithubProfile(reposUrl)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -41,9 +49,11 @@ func main() {
 		template.ExecuteTemplate(w, "home", profile)
 	})
 
+	fmt.Println("Server started at :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
+
 }
 
 func parseGithubProfile(url string) (profile GitHubProfile, err error) {
@@ -55,7 +65,10 @@ func parseGithubProfile(url string) (profile GitHubProfile, err error) {
 		return profile, err
 	} else {
 		doc.Find(".vcard-names-container .vcard-names").Each(func(i int, spans *goquery.Selection) {
-			name = spans.Find("span").Get(0).FirstChild.Data
+			if spans.Find("span").Get(0).FirstChild != nil {
+				name = spans.Find("span").Get(0).FirstChild.Data
+			}
+
 			login = spans.Find("span").Get(1).FirstChild.Data
 		})
 
