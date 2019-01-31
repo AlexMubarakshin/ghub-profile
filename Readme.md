@@ -1,6 +1,6 @@
 # ghub-profile
 
-Scrap my github profile and display personal github projects.
+Scrap github profile and display personal github projects.
 
 <p align="center">
   <img src="./screenshots/img.png" alt="Screenshot"
