@@ -11,8 +11,8 @@ Scrap my github profile and display personal github projects.
 ```
 $ go build ./ghub.go
 
-# For scrap your profile, pass in args your github nickname
-$ ./ghub.exe YourProfileName
+# For scrap your profile, pass in args your github nickname:
+$ ./ghub.exe -nickname=YourProfileName
 
 # Open localhost:8080
 ```

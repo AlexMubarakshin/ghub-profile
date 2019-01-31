@@ -1,35 +1,24 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 
+	"./models"
 	"./utils"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-type RepoLink struct {
-	Link  string
-	Label string
-}
-
-type GitHubProfile struct {
-	Repos []RepoLink
-	Name  string
-	Login string
-}
-
 func main() {
-	var reposUrl string
+	nickname := flag.String("nickname", "AlexMubarakshin", "Github user nickname")
+	flag.Parse()
 
-	if len(os.Args) > 1 {
-		reposUrl = utils.BuildGithubUrlByUsername(os.Args[1])
-	} else {
-		reposUrl = utils.BuildGithubUrlByUsername("AlexMubarakshin")
-	}
+	fmt.Println("Start scraping", *nickname, "profile")
+
+	reposUrl := utils.BuildGithubUrlByUsername(*nickname)
 
 	profile, err := parseGithubProfile(reposUrl)
 	if err != nil {
@@ -56,10 +45,10 @@ func main() {
 
 }
 
-func parseGithubProfile(url string) (profile GitHubProfile, err error) {
+func parseGithubProfile(url string) (profile models.GitHubProfile, err error) {
 	var name string
 	var login string
-	var repos []RepoLink
+	var repos []models.RepoLink
 
 	if doc, err := goquery.NewDocument(url); err != nil {
 		return profile, err
@@ -76,7 +65,7 @@ func parseGithubProfile(url string) (profile GitHubProfile, err error) {
 			projects.Find("h3 a").Each(func(i int, s *goquery.Selection) {
 				link, _ := s.Attr("href")
 				text := s.Text()
-				repos = append(repos, RepoLink{Link: "https://github.com" + link, Label: text})
+				repos = append(repos, models.RepoLink{Link: "https://github.com" + link, Label: text})
 			})
 		})
 	}
