@@ -14,8 +14,8 @@ func ParseGithubProfile(url string) (profile models.GitHubProfile, err error) {
 		return profile, err
 	} else {
 		doc.Find(".vcard-names-container .vcard-names").Each(func(i int, spans *goquery.Selection) {
-			if spans.Find("span").Get(0).FirstChild != nil {
-				name = spans.Find("span").Get(0).FirstChild.Data
+			if spanElement := spans.Find("span").Get(0).FirstChild; spanElement != nil {
+				name = spanElement.Data
 			}
 
 			login = spans.Find("span").Get(1).FirstChild.Data
